@@ -1,41 +1,44 @@
 const form = document.getElementById("alert-form");
-const result = document.getElementById("result");
 
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    const alertType = document.getElementById("alert-type").value;
-    const rawAlert = document.getElementById("raw-alert").value;
+    const alertType =
+        document.getElementById("alert-type").value;
 
-    result.innerHTML = "<p>Analyzing alert...</p>";
+    const rawAlert =
+        document.getElementById("raw-alert").value;
 
-    try {
-        const response = await fetch("/analyze", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                alert_type: alertType,
-                raw_alert: rawAlert,
-            }),
-        });
+    const response = await fetch("/analyze", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            alert_type: alertType,
+            raw_alert: rawAlert,
+        }),
+    });
 
-        const data = await response.json();
+    const data = await response.json();
 
-        if (!response.ok) {
-            result.innerHTML = `<p>${data}</p>`;
-            return;
-        }
-
-        result.innerHTML = `
-            <h2>Analysis Result</h2>
-            <p><strong>Alert Type:</strong> ${data.alert_type}</p>
-            <p><strong>Summary:</strong> ${data.summary}</p>
-            <p><strong>Severity:</strong> ${data.severity}</p>
-            <p><strong>Confidence:</strong> ${data.confidence}</p>
-        `;
-    } catch (error) {
-        result.innerHTML = "<p>Unable to analyze the alert.</p>";
-    }
+    displayResult(data);
 });
+
+function displayResult(data) {
+
+    document.getElementById("result").hidden = false;
+
+    document.getElementById("summary-section").innerHTML =
+        `<h3>Summary</h3>
+         <p>${data.summary}</p>`;
+
+    document.getElementById("severity-section").innerHTML =
+        `<h3>Severity</h3>
+         <p>${data.report.severity}</p>`;
+
+    document.getElementById("confidence-section").innerHTML =
+        `<h3>Confidence</h3>
+         <p>${data.report.confidence.level}
+         (${data.report.confidence.score}%)</p>`;
+}

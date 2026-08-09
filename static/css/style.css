@@ -10,24 +10,27 @@ body {
 }
 
 .container {
-    max-width: 900px;
-    margin: 60px auto;
+    max-width: 1000px;
+    margin: 50px auto;
     padding: 20px;
 }
 
 .card {
-    background: white;
+    background: #ffffff;
     padding: 32px;
-    border-radius: 12px;
+    border-radius: 14px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
 }
 
-h1 {
-    margin-top: 0;
+.page-header {
+    margin-bottom: 30px;
 }
 
-.intro {
-    margin-bottom: 30px;
+.page-header h1 {
+    margin-bottom: 10px;
+}
+
+.page-header p {
     line-height: 1.6;
 }
 
@@ -58,4 +61,14 @@ button {
     border-radius: 8px;
     cursor: pointer;
     font-size: 16px;
+}
+
+.result-panel {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.result-panel > div {
+    margin-top: 20px;
 }
