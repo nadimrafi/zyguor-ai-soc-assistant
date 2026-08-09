@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zyguor AI SOC Assistant</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <main class="container">
+        <section class="card">
+            <h1>Zyguor AI SOC Assistant</h1>
+
+            <p class="intro">
+                Analyze security alerts, extract important indicators,
+                and generate structured SOC triage guidance.
+            </p>
+
+            <form id="alert-form">
+                <label for="alert-type">Alert Type</label>
+
+                <input
+                    type="text"
+                    id="alert-type"
+                    name="alert_type"
+                    placeholder="Example: Multiple Failed Login Attempts"
+                    required
+                >
+
+                <label for="raw-alert">Raw Alert</label>
+
+                <textarea
+                    id="raw-alert"
+                    name="raw_alert"
+                    rows="12"
+                    placeholder="Paste the security alert here..."
+                    required
+                ></textarea>
+
+                <button type="submit">
+                    Analyze Alert
+                </button>
+            </form>
+
+            <div id="result"></div>
+        </section>
+    </main>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
