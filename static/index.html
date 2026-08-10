@@ -46,6 +46,7 @@
 
             <section id="result" class="result-panel" hidden>
                 <h2>Investigation Result</h2>
+                <div id="report-header" class="report-header"></div>
 
                 <div id="summary-section"></div>
                 <div id="severity-section"></div>
@@ -54,10 +55,19 @@
                 <div id="knowledge-section"></div>
                 <div id="recommendations-section"></div>
                 <div id="narrative-section"></div>
+                <div class="report-actions">
+    <button type="button" id="copy-report">
+        Copy Report
+    </button>
+
+    <button type="button" id="export-json">
+        Export JSON
+    </button>
+</div>
             </section>
         </section>
     </main>
 
-    <script src="/static/js/app.js?v=2"></script>
+    <script src="/static/js/app.js?v=6"></script>
 </body>
 </html>

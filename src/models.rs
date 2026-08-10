@@ -49,6 +49,9 @@ pub struct ConfidenceAssessment {
 
 #[derive(Debug, Serialize)]
 pub struct InvestigationReport {
+    pub report_id: String,
+    pub generated_at: u64,
+    pub case_status: String,
     pub severity: String,
     pub confidence: ConfidenceAssessment,
     pub mitre: Vec<MitreTechnique>,

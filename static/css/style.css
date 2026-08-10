@@ -72,3 +72,143 @@ button {
 .result-panel > div {
     margin-top: 20px;
 }
+.severity-badge {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+.severity-high {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.severity-medium {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.severity-low {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.finding {
+    padding: 14px;
+    margin-top: 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.finding p {
+    margin-bottom: 0;
+    line-height: 1.5;
+}
+
+.result-panel ul,
+.result-panel ol {
+    line-height: 1.7;
+}
+
+#narrative-section {
+    padding: 18px;
+    margin-top: 24px;
+    background: #f8fafc;
+    border-radius: 10px;
+}
+
+#narrative-section p {
+    line-height: 1.7;
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+.report-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+}
+
+.report-actions button {
+    margin-top: 0;
+}
+
+@media (max-width: 600px) {
+    .container {
+        margin: 20px auto;
+        padding: 12px;
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+    .report-actions {
+        flex-direction: column;
+    }
+
+    .report-actions button {
+        width: 100%;
+    }
+}
+.report-header {
+
+    padding: 18px;
+
+    margin-bottom: 28px;
+
+    border-radius: 10px;
+
+    background: #eef6ff;
+
+    border-left: 5px solid #2563eb;
+}
+
+.report-header p{
+
+    margin:8px 0;
+}
+.confidence-track {
+    width: 100%;
+    height: 12px;
+    margin-top: 10px;
+    overflow: hidden;
+    background: #e5e7eb;
+    border-radius: 999px;
+}
+
+.confidence-bar {
+    height: 100%;
+    background: #2563eb;
+    border-radius: 999px;
+    transition: width 0.4s ease;
+}
+
+.mitre-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.mitre-card {
+    padding: 16px;
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+    background: #eff6ff;
+}
+
+.mitre-card strong {
+    font-size: 18px;
+}
+
+.mitre-card p {
+    margin-bottom: 0;
+}

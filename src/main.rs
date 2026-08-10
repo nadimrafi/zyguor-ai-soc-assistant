@@ -10,6 +10,7 @@ mod narrative;
 mod parser;
 mod prompt;
 mod recommendations;
+mod report;
 mod responses;
 mod rules;
 mod state;

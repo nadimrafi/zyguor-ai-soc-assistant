@@ -6,6 +6,7 @@ use crate::models::{AnalyzeAlertRequest, AnalyzeAlertResponse, InvestigationRepo
 use crate::narrative::build_narrative;
 use crate::parser::parse_alert;
 use crate::recommendations::build_recommendations;
+use crate::report::{generate_report_id, generate_timestamp};
 use crate::rules::{Severity, determine_severity, map_mitre_techniques};
 use axum::{Json, http::StatusCode};
 
@@ -48,8 +49,24 @@ pub async fn analyze_alert(
     };
 
     let narrative = build_narrative(severity_text, &confidence, &mitre);
+    let report_id = generate_report_id().map_err(|error| {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("Unable to generate investigation ID: {error}"),
+        )
+    })?;
+
+    let generated_at = generate_timestamp().map_err(|error| {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("Unable to generate investigation timestamp: {error}"),
+        )
+    })?;
 
     let report = InvestigationReport {
+        report_id,
+        generated_at,
+        case_status: "Open".to_string(),
         severity: severity_text.to_string(),
         confidence,
         mitre,
