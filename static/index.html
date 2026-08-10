@@ -44,30 +44,39 @@
                 </button>
             </form>
 
-            <section id="result" class="result-panel" hidden>
-                <h2>Investigation Result</h2>
-                <div id="report-header" class="report-header"></div>
+            <section class="history-panel">
+    <h2>Investigation History</h2>
 
-                <div id="summary-section"></div>
-                <div id="severity-section"></div>
-                <div id="confidence-section"></div>
-                <div id="mitre-section"></div>
-                <div id="knowledge-section"></div>
-                <div id="recommendations-section"></div>
-                <div id="narrative-section"></div>
-                <div class="report-actions">
-    <button type="button" id="copy-report">
-        Copy Report
-    </button>
+    <div id="history-list">
+        <p>No investigations loaded.</p>
+    </div>
+</section>
 
-    <button type="button" id="export-json">
-        Export JSON
-    </button>
-</div>
-            </section>
+<section id="result" class="result-panel" hidden>
+    <h2>Investigation Result</h2>
+
+    <div id="report-header" class="report-header"></div>
+    <div id="summary-section"></div>
+    <div id="severity-section"></div>
+    <div id="confidence-section"></div>
+    <div id="mitre-section"></div>
+    <div id="knowledge-section"></div>
+    <div id="recommendations-section"></div>
+    <div id="narrative-section"></div>
+
+    <div class="report-actions">
+        <button type="button" id="copy-report">
+            Copy Report
+        </button>
+
+        <button type="button" id="export-json">
+            Export JSON
+        </button>
+    </div>
+</section>
         </section>
     </main>
 
-    <script src="/static/js/app.js?v=6"></script>
+    <script src="/static/js/app.js?v=10"></script>
 </body>
 </html>

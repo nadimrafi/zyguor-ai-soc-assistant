@@ -1,14 +1,14 @@
 use crate::confidence::calculate_confidence;
 use crate::ioc::extract_ipv4_addresses;
 use crate::knowledge::build_knowledge;
-
 use crate::models::{AnalyzeAlertRequest, AnalyzeAlertResponse, InvestigationReport};
 use crate::narrative::build_narrative;
 use crate::parser::parse_alert;
 use crate::recommendations::build_recommendations;
 use crate::report::{generate_report_id, generate_timestamp};
 use crate::rules::{Severity, determine_severity, map_mitre_techniques};
-use axum::{Json, http::StatusCode};
+use crate::storage::{list_reports, load_report, save_report};
+use axum::{Json, extract::Path as AxumPath, http::StatusCode};
 
 pub async fn analyze_alert(
     Json(payload): Json<AnalyzeAlertRequest>,
@@ -34,12 +34,9 @@ pub async fn analyze_alert(
     let ipv4_addresses = extract_ipv4_addresses(raw_alert);
 
     let severity = determine_severity(&parsed, &ipv4_addresses);
-
     let mitre = map_mitre_techniques(&parsed, &ipv4_addresses);
     let confidence = calculate_confidence(&parsed, &ipv4_addresses, &mitre);
-
     let knowledge = build_knowledge(&parsed, &severity, &mitre);
-
     let recommendations = build_recommendations(&parsed, &severity, &mitre);
 
     let severity_text = match severity {
@@ -49,6 +46,7 @@ pub async fn analyze_alert(
     };
 
     let narrative = build_narrative(severity_text, &confidence, &mitre);
+
     let report_id = generate_report_id().map_err(|error| {
         (
             StatusCode::INTERNAL_SERVER_ERROR,
@@ -75,6 +73,13 @@ pub async fn analyze_alert(
         narrative,
     };
 
+    save_report(&report).map_err(|error| {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("Unable to save investigation: {error}"),
+        )
+    })?;
+
     let response = AnalyzeAlertResponse {
         alert_type: alert_type.to_string(),
         summary: "Alert received, validated, and analyzed successfully.".to_string(),
@@ -87,4 +92,28 @@ pub async fn analyze_alert(
     };
 
     Ok(Json(response))
+}
+
+pub async fn history() -> Result<Json<Vec<String>>, (StatusCode, String)> {
+    let reports = list_reports().map_err(|error| {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("Unable to load investigation history: {error}"),
+        )
+    })?;
+
+    Ok(Json(reports))
+}
+
+pub async fn load_history_report(
+    AxumPath(report_id): AxumPath<String>,
+) -> Result<String, (StatusCode, String)> {
+    let report = load_report(&report_id).map_err(|error| {
+        (
+            StatusCode::NOT_FOUND,
+            format!("Unable to load investigation report: {error}"),
+        )
+    })?;
+
+    Ok(report)
 }

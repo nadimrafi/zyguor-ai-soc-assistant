@@ -14,6 +14,7 @@ mod report;
 mod responses;
 mod rules;
 mod state;
+mod storage;
 
 use axum::{
     Router,
@@ -21,8 +22,8 @@ use axum::{
     routing::{get, post},
 };
 
-use handlers::analyze_alert;
-use std::net::SocketAddr;
+use handlers::{analyze_alert, history, load_history_report};
+
 use tower_http::services::ServeDir;
 
 async fn home() -> Html<&'static str> {
@@ -30,21 +31,23 @@ async fn home() -> Html<&'static str> {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt::init();
 
     let app = Router::new()
         .route("/", get(home))
         .route("/analyze", post(analyze_alert))
+        .route("/history", get(history))
+        .route("/history/{report_id}", get(load_history_report))
         .nest_service("/static", ServeDir::new("static"));
 
-    let address = SocketAddr::from(([127, 0, 0, 1], 3000));
+    let address = "127.0.0.1:3000";
 
-    println!("Server running at http://{}", address);
+    println!("Server running at http://{address}");
 
-    let listener = tokio::net::TcpListener::bind(address)
-        .await
-        .expect("Failed to bind TCP listener");
+    let listener = tokio::net::TcpListener::bind(address).await?;
 
-    axum::serve(listener, app).await.expect("Server error");
+    axum::serve(listener, app).await?;
+
+    Ok(())
 }
