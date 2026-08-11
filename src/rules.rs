@@ -34,20 +34,26 @@ pub fn determine_severity(parsed: &ParsedAlert, ipv4_addresses: &[String]) -> Se
 }
 
 pub fn map_mitre_techniques(
+    alert_type: &str,
+    raw_alert: &str,
     parsed: &ParsedAlert,
     ipv4_addresses: &[String],
 ) -> Vec<MitreTechnique> {
     let mut techniques = Vec::new();
 
-    let privileged_account = parsed
-        .username
-        .as_deref()
-        .map(|username| {
-            username.eq_ignore_ascii_case("administrator")
-                || username.eq_ignore_ascii_case("admin")
-                || username.eq_ignore_ascii_case("root")
-        })
-        .unwrap_or(false);
+    let combined_text = format!("{alert_type} {raw_alert}").to_lowercase();
+
+    let authentication_failure_evidence = combined_text.contains("failed login")
+        || combined_text.contains("failed logon")
+        || combined_text.contains("multiple failed")
+        || combined_text.contains("brute force")
+        || combined_text.contains("bruteforce")
+        || combined_text.contains("password spray");
+
+    let successful_login_evidence = combined_text.contains("successful login")
+        || combined_text.contains("successful logon")
+        || combined_text.contains("valid credentials")
+        || combined_text.contains("account compromise");
 
     let external_ip_present = ipv4_addresses.iter().any(|ip| {
         ip.parse::<Ipv4Addr>()
@@ -55,14 +61,20 @@ pub fn map_mitre_techniques(
             .unwrap_or(false)
     });
 
-    if external_ip_present {
+    let privileged_account = parsed.username.as_deref().is_some_and(|username| {
+        username.eq_ignore_ascii_case("administrator")
+            || username.eq_ignore_ascii_case("admin")
+            || username.eq_ignore_ascii_case("root")
+    });
+
+    if authentication_failure_evidence && external_ip_present {
         techniques.push(MitreTechnique {
             technique_id: "T1110".to_string(),
             technique_name: "Brute Force".to_string(),
         });
     }
 
-    if privileged_account {
+    if successful_login_evidence && privileged_account {
         techniques.push(MitreTechnique {
             technique_id: "T1078".to_string(),
             technique_name: "Valid Accounts".to_string(),
@@ -124,17 +136,82 @@ mod tests {
     }
 
     #[test]
-    fn maps_mitre_techniques() {
+    fn maps_brute_force_when_failed_logins_and_external_ip_exist() {
         let parsed = parsed_alert_with_user(Some("administrator"));
 
         let ips = vec!["8.8.8.8".to_string()];
 
-        let mitre = map_mitre_techniques(&parsed, &ips);
+        let mitre = map_mitre_techniques(
+            "Multiple Failed Login Attempts",
+            "User: administrator\nSource IP: 8.8.8.8",
+            &parsed,
+            &ips,
+        );
 
-        assert_eq!(mitre.len(), 2);
+        assert!(
+            mitre
+                .iter()
+                .any(|technique| technique.technique_id == "T1110")
+        );
+    }
 
-        assert_eq!(mitre[0].technique_id, "T1110");
+    #[test]
+    fn external_ip_alone_does_not_map_brute_force() {
+        let parsed = parsed_alert_with_user(Some("user1"));
 
-        assert_eq!(mitre[1].technique_id, "T1078");
+        let ips = vec!["8.8.8.8".to_string()];
+
+        let mitre = map_mitre_techniques(
+            "Network Connection",
+            "User: user1\nSource IP: 8.8.8.8",
+            &parsed,
+            &ips,
+        );
+
+        assert!(
+            !mitre
+                .iter()
+                .any(|technique| technique.technique_id == "T1110")
+        );
+    }
+
+    #[test]
+    fn successful_privileged_login_maps_valid_accounts() {
+        let parsed = parsed_alert_with_user(Some("administrator"));
+
+        let ips = vec!["8.8.8.8".to_string()];
+
+        let mitre = map_mitre_techniques(
+            "Successful Login",
+            "User: administrator\nSource IP: 8.8.8.8",
+            &parsed,
+            &ips,
+        );
+
+        assert!(
+            mitre
+                .iter()
+                .any(|technique| technique.technique_id == "T1078")
+        );
+    }
+
+    #[test]
+    fn privileged_account_without_success_evidence_does_not_map_valid_accounts() {
+        let parsed = parsed_alert_with_user(Some("administrator"));
+
+        let ips = vec!["8.8.8.8".to_string()];
+
+        let mitre = map_mitre_techniques(
+            "Network Connection",
+            "User: administrator\nSource IP: 8.8.8.8",
+            &parsed,
+            &ips,
+        );
+
+        assert!(
+            !mitre
+                .iter()
+                .any(|technique| technique.technique_id == "T1078")
+        );
     }
 }

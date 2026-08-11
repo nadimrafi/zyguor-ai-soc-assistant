@@ -34,7 +34,7 @@ pub async fn analyze_alert(
     let ipv4_addresses = extract_ipv4_addresses(raw_alert);
 
     let severity = determine_severity(&parsed, &ipv4_addresses);
-    let mitre = map_mitre_techniques(&parsed, &ipv4_addresses);
+    let mitre = map_mitre_techniques(alert_type, raw_alert, &parsed, &ipv4_addresses);
     let confidence = calculate_confidence(&parsed, &ipv4_addresses, &mitre);
     let knowledge = build_knowledge(&parsed, &severity, &mitre);
     let recommendations = build_recommendations(&parsed, &severity, &mitre);
@@ -108,6 +108,10 @@ pub async fn history() -> Result<Json<Vec<String>>, (StatusCode, String)> {
 pub async fn load_history_report(
     AxumPath(report_id): AxumPath<String>,
 ) -> Result<String, (StatusCode, String)> {
+    if !crate::storage::is_valid_report_id(&report_id) {
+        return Err((StatusCode::BAD_REQUEST, "Invalid report ID.".to_string()));
+    }
+
     let report = load_report(&report_id).map_err(|error| {
         (
             StatusCode::NOT_FOUND,

@@ -124,6 +124,37 @@ function displayResult(data) {
     displayRecommendations(data);
     displayNarrative(data);
 }
+function addMetadataItem(
+    container,
+    labelText,
+    valueText
+) {
+    const item =
+        document.createElement("div");
+
+    item.className =
+        "metadata-item";
+
+    const label =
+        document.createElement("span");
+
+    label.className =
+        "metadata-label";
+
+    label.textContent =
+        labelText;
+
+    const value =
+        document.createElement("strong");
+
+    value.textContent =
+        valueText;
+
+    item.appendChild(label);
+    item.appendChild(value);
+
+    container.appendChild(item);
+}
 
 function displayReportHeader(data) {
     const reportHeader =
@@ -131,35 +162,85 @@ function displayReportHeader(data) {
 
     clearSection(reportHeader);
 
+    const brand =
+        document.createElement("div");
+
+    brand.className =
+        "report-brand";
+        const logo =
+    document.createElement("img");
+
+logo.src =
+    "/static/images/zyguor-logo.png";
+
+logo.alt =
+    "Zyguor";
+
+logo.className =
+    "report-logo";
+
+brand.appendChild(logo);
+
+    const brandName =
+        document.createElement("strong");
+
+    brandName.textContent =
+        "ZYGUOR";
+
+    const productName =
+        document.createElement("span");
+
+    productName.textContent =
+        "AI SOC Assistant";
+
+    brand.appendChild(brandName);
+    brand.appendChild(productName);
+
     const title =
         document.createElement("h2");
 
     title.textContent =
         "Security Investigation Report";
 
-    reportHeader.appendChild(title);
+    const metadata =
+        document.createElement("div");
 
-    addParagraph(
-        reportHeader,
-        `Report ID: ${data.report.report_id}`
-    );
-
-    addParagraph(
-        reportHeader,
-        `Status: ${data.report.case_status}`
-    );
+    metadata.className =
+        "report-metadata-grid";
 
     const generated =
         new Date(
             data.report.generated_at * 1000
-        ).toLocaleString();
+        ).toLocaleString(undefined, {
+            year: "numeric",
+            month: "short",
+            day: "2-digit",
+            hour: "numeric",
+            minute: "2-digit",
+        });
 
-    addParagraph(
-        reportHeader,
-        `Generated: ${generated}`
+    addMetadataItem(
+        metadata,
+        "Report ID",
+        data.report.report_id
     );
-}
 
+    addMetadataItem(
+        metadata,
+        "Status",
+        data.report.case_status
+    );
+
+    addMetadataItem(
+        metadata,
+        "Generated",
+        generated
+    );
+
+    reportHeader.appendChild(brand);
+    reportHeader.appendChild(title);
+    reportHeader.appendChild(metadata);
+}
 function displaySummary(data) {
     const section =
         document.getElementById("summary-section");
@@ -345,22 +426,64 @@ function displayRecommendations(data) {
         "Recommended Analyst Actions"
     );
 
-    const list =
-        document.createElement("ol");
+    const container =
+        document.createElement("div");
+
+    container.className =
+        "recommendation-grid";
 
     data.report.recommendations.forEach(
         (recommendation) => {
-            const item =
-                document.createElement("li");
+            const card =
+                document.createElement("div");
 
-            item.textContent =
-                `[${recommendation.priority}] ${recommendation.action}`;
+            const priority =
+                recommendation.priority.toLowerCase();
 
-            list.appendChild(item);
+            card.className =
+                `recommendation-card recommendation-${priority}`;
+
+            const header =
+                document.createElement("div");
+
+            header.className =
+                "recommendation-priority";
+
+            const icon =
+                document.createElement("span");
+
+            icon.textContent =
+                priority === "critical"
+                    ? "🔴"
+                    : priority === "high"
+                    ? "🟠"
+                    : priority === "medium"
+                    ? "🟡"
+                    : "🟢";
+
+            const label =
+                document.createElement("strong");
+
+            label.textContent =
+                recommendation.priority;
+
+            header.appendChild(icon);
+            header.appendChild(label);
+
+            const action =
+                document.createElement("p");
+
+            action.textContent =
+                recommendation.action;
+
+            card.appendChild(header);
+            card.appendChild(action);
+
+            container.appendChild(card);
         }
     );
 
-    section.appendChild(list);
+    section.appendChild(container);
 }
 
 function displayNarrative(data) {
@@ -550,9 +673,23 @@ async function loadHistory() {
                     button.className =
                         "history-item";
 
-                    button.textContent =
-                        reportId;
+                    const title =
+    document.createElement("strong");
 
+title.textContent =
+    `📄 ${reportId}`;
+
+const status =
+    document.createElement("p");
+
+status.textContent =
+    "🟢 Open";
+
+status.className =
+    "history-status";
+
+button.appendChild(title);
+button.appendChild(status);
                     button.addEventListener(
                         "click",
                         () =>

@@ -1,0 +1,50 @@
+{
+  "report_id": "SOC-1786367283",
+  "generated_at": 1786367283,
+  "case_status": "Open",
+  "severity": "Medium",
+  "confidence": {
+    "score": 80,
+    "level": "High",
+    "reasons": [
+      "Username identified",
+      "Valid IPv4 indicator identified",
+      "MITRE ATT&CK mapping available"
+    ]
+  },
+  "mitre": [
+    {
+      "technique_id": "T1078",
+      "technique_name": "Valid Accounts"
+    }
+  ],
+  "knowledge": [
+    {
+      "title": "Privileged Account",
+      "description": "The alert involves the privileged account 'admin'."
+    },
+    {
+      "title": "Medium Severity",
+      "description": "The alert has been classified as Medium."
+    },
+    {
+      "title": "MITRE T1078",
+      "description": "Valid Accounts"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "High",
+      "action": "Verify whether activity involving the privileged account is legitimate."
+    },
+    {
+      "priority": "High",
+      "action": "Confirm that multi-factor authentication is enabled for the privileged account."
+    },
+    {
+      "priority": "Medium",
+      "action": "Perform additional investigation and validate the observed activity."
+    }
+  ],
+  "narrative": "The alert has been classified as Medium severity. The confidence in this assessment is High (80%). Mapped MITRE ATT&CK techniques include T1078 (Valid Accounts)."
+}

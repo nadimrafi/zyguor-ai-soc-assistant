@@ -8,6 +8,10 @@ mod knowledge;
 mod models;
 mod narrative;
 mod parser;
+mod pdf;
+mod pdf_assets;
+mod pdf_builder;
+mod pdf_layout;
 mod prompt;
 mod recommendations;
 mod report;
@@ -33,6 +37,7 @@ async fn home() -> Html<&'static str> {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt::init();
+    pdf::create_sample_pdf()?;
 
     let app = Router::new()
         .route("/", get(home))
