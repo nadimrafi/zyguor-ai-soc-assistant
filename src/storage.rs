@@ -62,6 +62,15 @@ pub fn load_report(report_id: &str) -> io::Result<String> {
 
     fs::read_to_string(filename)
 }
+
+pub fn load_report_model(report_id: &str) -> io::Result<crate::models::InvestigationReport> {
+    let json = load_report(report_id)?;
+
+    let report = serde_json::from_str(&json).map_err(io::Error::other)?;
+
+    Ok(report)
+}
+
 #[cfg(test)]
 mod tests {
     use super::is_valid_report_id;

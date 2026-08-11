@@ -4,11 +4,46 @@ use crate::knowledge::build_knowledge;
 use crate::models::{AnalyzeAlertRequest, AnalyzeAlertResponse, InvestigationReport};
 use crate::narrative::build_narrative;
 use crate::parser::parse_alert;
+use crate::pdf::generate_investigation_pdf;
 use crate::recommendations::build_recommendations;
 use crate::report::{generate_report_id, generate_timestamp};
+
 use crate::rules::{Severity, determine_severity, map_mitre_techniques};
 use crate::storage::{list_reports, load_report, save_report};
-use axum::{Json, extract::Path as AxumPath, http::StatusCode};
+use axum::{Json, extract::Path as AxumPath, http::StatusCode, response::IntoResponse};
+
+pub async fn export_pdf(
+    AxumPath(report_id): AxumPath<String>,
+) -> Result<impl IntoResponse, (StatusCode, String)> {
+    if !crate::storage::is_valid_report_id(&report_id) {
+        return Err((StatusCode::BAD_REQUEST, "Invalid report ID.".to_string()));
+    }
+
+    let report = crate::storage::load_report_model(&report_id).map_err(|error| {
+        (
+            StatusCode::NOT_FOUND,
+            format!("Unable to load report: {error}"),
+        )
+    })?;
+
+    std::fs::create_dir_all("exports").map_err(|error| {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("Unable to create export directory: {error}"),
+        )
+    })?;
+
+    let output_path = format!("exports/{report_id}.pdf");
+
+    generate_investigation_pdf(&report, &output_path).map_err(|error| {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("Unable to generate PDF: {error}"),
+        )
+    })?;
+
+    Ok(format!("PDF generated successfully: {output_path}"))
+}
 
 pub async fn analyze_alert(
     Json(payload): Json<AnalyzeAlertRequest>,

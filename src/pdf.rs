@@ -5,7 +5,10 @@ use printpdf::{PdfDocument, PdfSaveOptions};
 use std::fs::File;
 use std::io::{BufWriter, Write};
 
-pub fn create_sample_pdf() -> Result<(), Box<dyn std::error::Error>> {
+pub fn generate_investigation_pdf(
+    _report: &crate::models::InvestigationReport,
+    output_path: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
     let mut document = PdfDocument::new("Zyguor SOC Investigation Report");
 
     let page = build_cover_page();
@@ -16,7 +19,7 @@ pub fn create_sample_pdf() -> Result<(), Box<dyn std::error::Error>> {
 
     let bytes = document.save(&PdfSaveOptions::default(), &mut warnings);
 
-    let file = File::create("sample-report.pdf")?;
+    let file = File::create(output_path)?;
 
     let mut writer = BufWriter::new(file);
 

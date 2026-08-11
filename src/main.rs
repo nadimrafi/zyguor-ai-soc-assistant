@@ -15,10 +15,13 @@ mod pdf_layout;
 mod prompt;
 mod recommendations;
 mod report;
+//mod report_builder;
 mod responses;
 mod rules;
 mod state;
 mod storage;
+
+use handlers::export_pdf;
 
 use axum::{
     Router,
@@ -37,13 +40,13 @@ async fn home() -> Html<&'static str> {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt::init();
-    pdf::create_sample_pdf()?;
 
     let app = Router::new()
         .route("/", get(home))
         .route("/analyze", post(analyze_alert))
         .route("/history", get(history))
         .route("/history/{report_id}", get(load_history_report))
+        .route("/report/{report_id}/pdf", get(export_pdf))
         .nest_service("/static", ServeDir::new("static"));
 
     let address = "127.0.0.1:3000";

@@ -6,7 +6,7 @@ pub struct AnalyzeAlertRequest {
     pub raw_alert: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct AnalyzeAlertResponse {
     pub alert_type: String,
     pub summary: String,
@@ -24,30 +24,30 @@ pub struct ParsedAlert {
     pub hostname: Option<String>,
     pub timestamp: Option<String>,
 }
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct MitreTechnique {
     pub technique_id: String,
     pub technique_name: String,
 }
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct KnowledgeFact {
     pub title: String,
     pub description: String,
 }
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Recommendation {
     pub priority: String,
     pub action: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ConfidenceAssessment {
     pub score: u8,
     pub level: String,
     pub reasons: Vec<String>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct InvestigationReport {
     pub report_id: String,
     pub generated_at: u64,
