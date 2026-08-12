@@ -1,1 +1,17 @@
 /target
+
+# macOS
+.DS_Store
+
+# Runtime investigation data
+/investigations/
+
+# Generated PDF exports
+/exports/
+
+# Temporary / sample generated files
+sample-report.pdf
+
+# Environment / secrets
+.env
+.env.*
