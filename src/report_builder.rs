@@ -14,7 +14,9 @@ pub struct ExportReport {
 pub struct ReportBuilder;
 
 impl ReportBuilder {
-    pub fn build(response: &AnalyzeAlertResponse) -> ExportReport {
+    pub fn build(
+        response: &AnalyzeAlertResponse,
+    ) -> ExportReport {
         ExportReport {
             report_id: response.report.report_id.clone(),
             status: response.report.case_status.clone(),

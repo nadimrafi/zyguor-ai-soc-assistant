@@ -1,4 +1,4 @@
-use crate::pdf_builder::build_cover_page;
+use crate::pdf_builder::build_report_page;
 
 use printpdf::{PdfDocument, PdfSaveOptions};
 
@@ -6,12 +6,12 @@ use std::fs::File;
 use std::io::{BufWriter, Write};
 
 pub fn generate_investigation_pdf(
-    _report: &crate::models::InvestigationReport,
+    report: &crate::models::InvestigationReport,
     output_path: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let mut document = PdfDocument::new("Zyguor SOC Investigation Report");
 
-    let page = build_cover_page();
+    let page = build_report_page(report);
 
     document.with_pages(vec![page]);
 
