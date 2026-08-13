@@ -58,4 +58,7 @@ pub struct InvestigationReport {
     pub knowledge: Vec<KnowledgeFact>,
     pub recommendations: Vec<Recommendation>,
     pub narrative: String,
+
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub ai_analysis: Option<String>,
 }

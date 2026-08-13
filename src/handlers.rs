@@ -8,6 +8,7 @@ use crate::pdf::generate_investigation_pdf;
 use crate::recommendations::build_recommendations;
 use crate::report::{generate_report_id, generate_timestamp};
 
+use crate::ai::generate_ai_analysis;
 use crate::rules::{Severity, determine_severity, map_mitre_techniques};
 use crate::storage::{list_reports, load_report, save_report};
 use axum::{Json, extract::Path as AxumPath, http::StatusCode, response::IntoResponse};
@@ -96,7 +97,7 @@ pub async fn analyze_alert(
         )
     })?;
 
-    let report = InvestigationReport {
+    let mut report = InvestigationReport {
         report_id,
         generated_at,
         case_status: "Open".to_string(),
@@ -106,7 +107,21 @@ pub async fn analyze_alert(
         knowledge,
         recommendations,
         narrative,
+        ai_analysis: None,
     };
+
+    match generate_ai_analysis(&report).await {
+        Ok(analysis) => {
+            tracing::info!("AI analysis completed successfully.");
+            report.ai_analysis = Some(analysis);
+        }
+
+        Err(error) => {
+            tracing::warn!(
+                "AI analysis unavailable; continuing with deterministic Rust analysis: {error}"
+            );
+        }
+    }
 
     save_report(&report).map_err(|error| {
         (
