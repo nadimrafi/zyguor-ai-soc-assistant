@@ -1,4 +1,4 @@
-use crate::pdf_builder::build_report_page;
+use crate::pdf_builder::build_report_pages;
 
 use printpdf::{PdfDocument, PdfSaveOptions};
 
@@ -11,9 +11,9 @@ pub fn generate_investigation_pdf(
 ) -> Result<(), Box<dyn std::error::Error>> {
     let mut document = PdfDocument::new("Zyguor SOC Investigation Report");
 
-    let page = build_report_page(report);
+    let pages = build_report_pages(report);
 
-    document.with_pages(vec![page]);
+    document.with_pages(pages);
 
     let mut warnings = Vec::new();
 
