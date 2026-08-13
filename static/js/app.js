@@ -123,6 +123,7 @@ function displayResult(data) {
     displayKnowledge(data);
     displayRecommendations(data);
     displayNarrative(data);
+    displayAiAnalysis(data);
 }
 function addMetadataItem(
     container,
@@ -759,3 +760,40 @@ async function loadSavedReport(reportId) {
 }
 
 loadHistory();
+
+function displayAiAnalysis(data) {
+    const section =
+        document.getElementById("ai-analysis-section");
+
+    clearSection(section);
+
+    addHeading(
+        section,
+        "AI-Assisted Analyst Explanation"
+    );
+
+    const analysis = data.report.ai_analysis;
+
+    if (!analysis) {
+        addParagraph(
+            section,
+            "AI analysis is unavailable. Deterministic Rust analysis remains valid."
+        );
+
+        return;
+    }
+
+    const cleanedAnalysis = analysis
+        .replace(/\*\*/g, "")
+        .replace(/^\s*\*\s+/gm, "• ")
+        .trim();
+
+    const paragraphs = cleanedAnalysis
+        .split(/\n\s*\n/)
+        .map((paragraph) => paragraph.trim())
+        .filter(Boolean);
+
+    for (const paragraph of paragraphs) {
+        addParagraph(section, paragraph);
+    }
+}
